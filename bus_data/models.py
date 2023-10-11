@@ -5,6 +5,8 @@ class Route(models.Model):
     name = models.CharField(max_length=50)
     # Departure = 去程, Return = 回程
     direction = models.CharField(max_length=50)
+    # 這也會一併定義 Stop#route_set
+    stop_set = models.ManyToManyField("Stop", through="RouteStop")
 
 
 class Stop(models.Model):
