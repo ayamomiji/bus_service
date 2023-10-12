@@ -16,6 +16,15 @@ class TestHelpers:
         stop.save()
         return stop
 
+    def create_notifier(self, route=None, stop=None):
+        if route is None:
+            route = self.create_route()
+        if stop is None:
+            stop = self.create_stop()
+        notifier = Notifier(route=route, stop=stop)
+        notifier.save()
+        return notifier
+
 
 class TestModels(TestCase, TestHelpers):
     def test_notifier_can_create(self):
@@ -52,7 +61,17 @@ class TestViews(TestCase, TestHelpers):
         )
         self.assertEqual(response.status_code, 422)
 
-    def test_destroy(self):
+    def test_destroy_success(self):
+        notifier = self.create_notifier()
+        response = self.client.delete(
+            reverse("bus_notifiers:member", kwargs={"id": notifier.id})
+        )
+        self.assertEqual(
+            response.content.decode("utf-8"),
+            json.dumps({"ok": True}),
+        )
+
+    def test_destroy_fail(self):
         response = self.client.delete(reverse("bus_notifiers:member", kwargs={"id": 1}))
         self.assertEqual(
             response.content.decode("utf-8"),
