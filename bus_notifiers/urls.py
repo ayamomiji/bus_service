@@ -5,5 +5,6 @@ from . import views
 app_name = "bus_notifiers"
 
 urlpatterns = [
-    path("", views.index, name="index"),
+    path("", views.collection, name="collection"),
+    path("<int:id>", views.member, name="member"),
 ]
