@@ -44,6 +44,8 @@ class TestViews(TestCase, TestHelpers):
     def test_create_success(self):
         route = self.create_route()
         stop = self.create_stop()
+        route.stop_set.add(stop, through_defaults={"order": 1})
+
         response = self.client.post(
             reverse("bus_notifiers:collection"),
             json.dumps({"route_id": route.id, "stop_id": stop.id}),
@@ -54,9 +56,19 @@ class TestViews(TestCase, TestHelpers):
             json.dumps({"notifier": Notifier.objects.last().as_json()}),
         )
 
-    def test_create_fail(self):
+    def test_create_with_invalid_data(self):
         response = self.client.post(
             reverse("bus_notifiers:collection"),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 422)
+
+    def test_create_with_not_associated(self):
+        route = self.create_route()
+        stop = self.create_stop()
+        response = self.client.post(
+            reverse("bus_notifiers:collection"),
+            json.dumps({"route_id": route.id, "stop_id": stop.id}),
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 422)
@@ -71,7 +83,7 @@ class TestViews(TestCase, TestHelpers):
             json.dumps({"ok": True}),
         )
 
-    def test_destroy_fail(self):
+    def test_destroy_with_not_found(self):
         response = self.client.delete(reverse("bus_notifiers:member", kwargs={"id": 1}))
         self.assertEqual(
             response.content.decode("utf-8"),

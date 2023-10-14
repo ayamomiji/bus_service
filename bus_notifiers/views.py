@@ -33,18 +33,24 @@ def index(request):
 class CreateForm(forms.Form):
     route_id = forms.IntegerField(required=True)
     stop_id = forms.IntegerField(required=True)
+    route = None
+    stop = None
 
     def clean_route_id(self):
         id = self.cleaned_data["route_id"]
-        if not Route.objects.filter(pk=id).exists():
+        try:
+            self.route = Route.objects.get(pk=id)
+            return id
+        except Route.DoesNotExist:
             raise forms.ValidationError("route_id is not valid")
-        return id
 
     def clean_stop_id(self):
         id = self.cleaned_data["stop_id"]
-        if not Stop.objects.filter(pk=id).exists():
+        try:
+            self.stop = self.route.stop_set.get(pk=id)
+            return id
+        except Stop.DoesNotExist:
             raise forms.ValidationError("stop_id is not valid")
-        return id
 
 
 def create(request):
