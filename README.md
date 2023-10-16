@@ -16,7 +16,8 @@ Bus Service
 
     curl -X POST 'http://localhost:8000/bus_notifiers/' -d '{
         "route": "307",
-        "stop": "捷運南京復興站"
+        "stop": "捷運南京復興站",
+        "direction": 0
     }'
 
 查詢所有訂閱項目:

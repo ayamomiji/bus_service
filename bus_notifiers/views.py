@@ -31,6 +31,9 @@ def index(request):
 class CreateForm(forms.Form):
     route = forms.CharField(required=True)
     stop = forms.CharField(required=True)
+    direction = forms.ChoiceField(
+        required=True, choices=[(0, "Departure"), (1, "Return")]
+    )
 
     def validate_route(self, route):
         data = tdx.get_route(route, 1, 0)
