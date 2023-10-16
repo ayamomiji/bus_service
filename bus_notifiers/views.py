@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import render
 
-from bus_data.models import Route, Stop
+from bus_notifiers.tdx import client as tdx
 
 from .models import Notifier
 
@@ -18,9 +18,7 @@ def collection(request):
 
 
 def index(request):
-    paginator = Paginator(
-        Notifier.objects.prefetch_related("route", "stop").order_by("-id"), 20
-    )
+    paginator = Paginator(Notifier.objects.order_by("-id"), 20)
     page_number = request.GET.get("page", None)
     if page_number is None or "":
         page_number = 1
@@ -31,26 +29,32 @@ def index(request):
 
 
 class CreateForm(forms.Form):
-    route_id = forms.IntegerField(required=True)
-    stop_id = forms.IntegerField(required=True)
-    route = None
-    stop = None
+    route = forms.CharField(required=True)
+    stop = forms.CharField(required=True)
 
-    def clean_route_id(self):
-        id = self.cleaned_data["route_id"]
-        try:
-            self.route = Route.objects.get(pk=id)
-            return id
-        except Route.DoesNotExist:
-            raise forms.ValidationError("route_id is not valid")
+    def validate_route(self, route):
+        data = tdx.get_route(route, 1, 0)
+        if len(data) == 0:
+            raise forms.ValidationError("invalid route")
 
-    def clean_stop_id(self):
-        id = self.cleaned_data["stop_id"]
-        try:
-            self.stop = self.route.stop_set.get(pk=id)
-            return id
-        except Stop.DoesNotExist:
-            raise forms.ValidationError("stop_id is not valid")
+    def validate_stop(self, route, stop):
+        skip = 0
+        while True:
+            data = tdx.get_stop_of_route(route, 30, skip)
+            if len(data) == 0:
+                raise forms.ValidationError("invalid stop")
+            for row in data:
+                for stop_row in row["Stops"]:
+                    if stop_row["StopName"]["Zh_tw"] == stop:
+                        return
+            skip += 30
+
+    def clean(self):
+        cleaned_data = super().clean()
+        self.validate_route(cleaned_data["route"])
+        self.validate_stop(cleaned_data["route"], cleaned_data["stop"])
+
+        return cleaned_data
 
 
 def create(request):

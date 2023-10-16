@@ -12,15 +12,11 @@ Bus Service
 
 ## Usage
 
-查詢路線與經過站牌的 id:
-
-    curl 'http://localhost:8000/bus_data/routes?q=307' | jq
-
 訂閱一個通知:
 
     curl -X POST 'http://localhost:8000/bus_notifiers/' -d '{
-        "route_id": 613,
-        "stop_id": 22961
+        "route": "307",
+        "stop": "捷運南京復興站"
     }'
 
 查詢所有訂閱項目:
@@ -29,4 +25,4 @@ Bus Service
 
 得到 notifier id 後, 可以取消通知:
 
-    curl -X DELETE 'http://localhost:8000/bus_notifiers/3'
+    curl -X DELETE 'http://localhost:8000/bus_notifiers/1'

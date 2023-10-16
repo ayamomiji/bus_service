@@ -1,2 +1,2 @@
 web: ./manage.py runserver
-worker: celery -A bus_service worker -l INFO
+worker: celery -A bus_service worker -l INFO --beat

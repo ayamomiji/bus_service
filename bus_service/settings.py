@@ -36,7 +36,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "bus_data.apps.BusDataConfig",
     "bus_notifiers.apps.BusNotifiersConfig",
     "django.contrib.admin",
     "django.contrib.auth",
