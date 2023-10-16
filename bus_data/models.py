@@ -9,6 +9,14 @@ class Route(models.Model):
     # 這也會一併定義 Stop#route_set
     stop_set = models.ManyToManyField("Stop", through="RouteStop")
 
+    def as_json(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "direction": self.direction,
+            "stops": [stop.as_json() for stop in self.stop_set.all()],
+        }
+
     class Meta:
         indexes = [models.Index(fields=["tdx_id", "direction"])]
 
@@ -16,6 +24,9 @@ class Route(models.Model):
 class Stop(models.Model):
     tdx_id = models.CharField(max_length=50, null=True)
     name = models.CharField(max_length=50)
+
+    def as_json(self):
+        return {"id": self.id, "name": self.name}
 
     class Meta:
         indexes = [models.Index(fields=["tdx_id"])]
