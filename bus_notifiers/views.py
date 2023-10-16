@@ -34,6 +34,7 @@ class CreateForm(forms.Form):
     direction = forms.ChoiceField(
         required=True, choices=[(0, "Departure"), (1, "Return")]
     )
+    email = forms.CharField(required=True)
 
     def validate_route(self, route):
         data = tdx.get_route(route, 1, 0)

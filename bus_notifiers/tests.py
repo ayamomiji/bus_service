@@ -29,7 +29,14 @@ class TestViews(TestCase):
     def test_create_success(self):
         response = self.client.post(
             reverse("bus_notifiers:collection"),
-            json.dumps({"route": "307", "stop": "捷運南京復興站", "direction": 0}),
+            json.dumps(
+                {
+                    "route": "307",
+                    "stop": "捷運南京復興站",
+                    "direction": 0,
+                    "email": "ayaya.zhao@gmail.com",
+                }
+            ),
             content_type="application/json",
         )
         self.assertEqual(
