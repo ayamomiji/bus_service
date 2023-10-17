@@ -20,7 +20,7 @@ def collection(request):
 def index(request):
     paginator = Paginator(Notifier.objects.order_by("-id"), 20)
     page_number = request.GET.get("page", None)
-    if page_number is None or "":
+    if page_number is None or page_number == "":
         page_number = 1
     page = paginator.page(page_number)
     notifiers = page.object_list
