@@ -1,10 +1,11 @@
 from bus_notifiers.models import Notifier
+from bus_notifiers.tdx.client import get_estimated_time_of_arrive
 from bus_service.celery import app
 
 
 @app.task(bind=True, ignore_result=True)
 def check_notifiers(self):
-    notifiers = Notifier.objects.all()
+    notifiers = Notifier.stale_objects.all()
     for notifier in notifiers:
         check_notifier.delay(notifier.id, 30, 0)
 
@@ -14,10 +15,10 @@ def check_notifier(self, notifier_id, top, skip):
     notifier = Notifier.objects.get(pk=notifier_id)
     route = notifier.route
     stop = notifier.stop
+    direction = notifier.direction
 
-    # data = get_route_near_stop(route.name, top, skip)
+    data = get_estimated_time_of_arrive(route, stop, direction, top=top, skip=skip)
+    notifier.notify([row["EstimateTime"] for row in data if row["EstimateTime"] < 1000])
 
-    # for row in data:
-    #     print(row["StopUID"])
-    #     stop = route.stop_set.get(tdx_id=row["StopUID"])
-    #     print(stop.name)
+    if len(data) > top:
+        check_notifier.delay(notifier.id, top, skip + top)
