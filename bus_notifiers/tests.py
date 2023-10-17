@@ -8,7 +8,7 @@ from .models import Notifier
 
 class TestModels(TestCase):
     def test_notifier_can_create(self):
-        Notifier.objects.create(route="307", stop="捷運南京復興站")
+        Notifier.objects.create(route="307", stop="捷運南京復興站", direction=0)
 
 
 class TestViews(TestCase):
@@ -19,7 +19,7 @@ class TestViews(TestCase):
         )
 
     def test_index_with_data(self):
-        notifier = Notifier.objects.create(route="307", stop="捷運南京復興站")
+        notifier = Notifier.objects.create(route="307", stop="捷運南京復興站", direction=0)
         response = self.client.get(reverse("bus_notifiers:collection"))
         self.assertEqual(
             response.content.decode("utf-8"),
@@ -53,7 +53,7 @@ class TestViews(TestCase):
         self.assertEqual(response.status_code, 422)
 
     def test_destroy_success(self):
-        notifier = Notifier.objects.create(route="307", stop="捷運南京復興站")
+        notifier = Notifier.objects.create(route="307", stop="捷運南京復興站", direction=0)
         response = self.client.delete(
             reverse("bus_notifiers:member", kwargs={"id": notifier.id})
         )
