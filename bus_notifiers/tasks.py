@@ -1,5 +1,5 @@
 from bus_notifiers.models import Notifier
-from bus_notifiers.tdx.client import get_estimated_time_of_arrive
+from bus_notifiers.tdx.client import get_estimated_time_of_arrive_with_stop
 from bus_service.celery import app
 
 
@@ -17,7 +17,9 @@ def check_notifier(self, notifier_id, top, skip):
     stop = notifier.stop
     direction = notifier.direction
 
-    data = get_estimated_time_of_arrive(route, stop, direction, top=top, skip=skip)
+    data = get_estimated_time_of_arrive_with_stop(
+        route, stop, direction, top=top, skip=skip
+    )
     notifier.notify([row["EstimateTime"] for row in data if row["EstimateTime"] < 1000])
 
     if len(data) > top:

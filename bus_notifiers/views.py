@@ -15,6 +15,7 @@ def collection(request):
         return index(request)
     if request.method == "POST":
         return create(request)
+    return JsonResponse({"error": "Method not allowed"}, status=405)
 
 
 def index(request):
@@ -88,3 +89,21 @@ def destroy(request, id):
         return JsonResponse({"ok": True})
     except Notifier.DoesNotExist:
         return JsonResponse({"error": "Not found"}, status=404)
+
+
+def routes_collection(request):
+    if request.method != "GET":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+    route = request.GET.get("route")
+    skip = request.GET.get("skip", "0")
+    data = tdx.get_estimated_time_of_arrive(route, 30, int(skip))
+
+    returning_data = [{"direction": 0, "stops": []}, {"direction": 1, "stops": []}]
+
+    for row in data:
+        if "EstimateTime" in row:
+            returning_data[row["Direction"]]["stops"].append(
+                {"stop": row["StopName"]["Zh_tw"], "estimateTime": row["EstimateTime"]}
+            )
+
+    return JsonResponse({"data": returning_data})

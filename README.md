@@ -18,6 +18,10 @@ Bus Service
 
 ## Usage
 
+查詢公車到站時間, 由於資料很多需要自行分頁:
+
+    curl 'http://localhost:8000/bus_notifiers/routes?route=307&skip=0'
+
 訂閱一個通知:
 
     curl -X POST 'http://localhost:8000/bus_notifiers/' -d '{

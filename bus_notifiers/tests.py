@@ -68,3 +68,9 @@ class TestViews(TestCase):
             response.content.decode("utf-8"),
             json.dumps({"error": "Not found"}),
         )
+
+    def test_routes_collection(self):
+        response = self.client.get(
+            reverse("bus_notifiers:routes_collection"), data={"route": "307"}
+        )
+        print(response.content.decode("utf-8"))
